@@ -170,64 +170,15 @@ int main(void)
 	HAL_GPIO_WritePin(C3_3V_GPIO_Port, C3_3V_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(C4V_GPIO_Port, C4V_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(C5V_GPIO_Port, C5V_Pin, GPIO_PIN_RESET);
-//for(int i = 0; i<10;i++){
-//		if(PMS7003_ReceiveData(&huart3) == PMS7003_RECEIVED){
-//		#ifdef DEBUG
-//		printf("Frame: %d\r\n ",pms7003.frame);
-//		printf("Checksum: %d\r\n ",pms7003.checksum);
-//		printf("PM1.0: %d ",pms7003.pm1p0);
-//		printf("PM2.5: %d ",pms7003.pm2p5);
-//		printf("PM10: %d\r\n",pms7003.pm10);
-//		printf("-PM1.0: %d",pms7003.pm1p0_ATM);
-//		printf("-PM2.5: %d",pms7003.pm2p5_ATM);
-//		printf("-PM10 %d\r\n",pms7003.pm10_ATM);
-//		#endif
-//		}
-//}
-		SIM_begin();
-		HAL_Delay(1000);
-		SIM_checkAccount();
-		RTC_SetTime(15,32,0,14,8,18);
-//		RTC_SetAlarm1(0,15,32,30,DS3231_MATCH_H_M_S,true);
-//		RTC_GetControl();
-//		HAL_Delay(5000);
 
-	//Initial SD card
-	disk_initialize(SDFatFs.drv);
-	memcpy(SD.filename,"thuong.txt",strlen("thuong.txt")+1);
-	memcpy(SD.wdata,SD.filename,strlen(SD.filename));
-	memcpy(SD.wdata,"aaaaaa",strlen("aaaaaa"));
-	SD.size = strlen(SD.wdata);
-	//Write data
-  SD_Write_File(SD.filename, SD.wdata, SD.size);
-	HAL_Delay(1000);
-	//Read data
-	SD_Read_File(SD.filename);
 	
-//	 HAL_ADC_Start_DMA(&hadc1, (uint32_t*) sensor.ADC_Raw, 4);
-//	 HAL_Delay(10);
-//	 if(sensor.fAdc){
-//		 
-//		Sensor_Convertdata(&sensor);
-//	 }
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		RTC_GetTime();
-		#ifdef DEBUG
-		printf(" %d-%d-%d", DS3231.date, DS3231.month, DS3231.year);
-		printf(" %d:%d:%d\r\n", DS3231.hour, DS3231.min, DS3231.sec);
-		#endif
-//		RTC_GetAlarm1();
-//		RTC_GetControl();
-		GPS_RawData();	
-		HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-		HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
-		HAL_Delay(1000);
-		
+		RTC_GetTime();		
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
