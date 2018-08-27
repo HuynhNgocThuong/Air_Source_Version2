@@ -25,6 +25,18 @@ DS3231
 		RTC_GetAlarm1();
 		RTC_GetControl();
 		#endif
+DS3231
+		#ifdef DEBUG
+		RTC_GetTime();
+		printf(" %d-%d-%d", DS3231.date, DS3231.month, DS3231.year);
+		printf(" %d:%d:%d\r\n", DS3231.hour, DS3231.min, DS3231.sec);
+		RTC_GetAlarm1();	
+		check = RTC_GetControl();
+		check.status&=0x01;
+		if(check.status){	
+		RTC_SetAlarm1(0,5,31,0,DS3231_MATCH_H_M_S,true);
+		}
+		#endif
 		
 SD Card
 	//Initial SD card
@@ -47,3 +59,32 @@ Sensor
 	 }
 NEO6M
 		GPS_RawData();	
+		
+		SD_Push_Data("Thuong.txt",DS3231.date, DS3231.month, DS3231.year, DS3231.hour,DS3231.min,DS3231.sec,dataGps.Latitude,dataGps.S_N,dataGps.Longtitude,dataGps.E_W,pms7003.pm10,
+			pms7003.pm1p0,pms7003.pm2p5,sensor.ppmCO,sensor.ppmNO2,sensor.ppmSO2,sensor.vAcquy);
+			
+					sprintf(SD.pm10,"%d", pms7003.pm10);
+		sprintf(SD.pm1p0,"%d", pms7003.pm1p0);
+		sprintf(SD.pm2p5,"%d", pms7003.pm2p5);
+		sprintf(SD.ppmCO,"%f", sensor.ppmCO);
+		sprintf(SD.ppmNO2,"%f", sensor.ppmNO2);
+		sprintf(SD.ppmSO2,"%f", sensor.ppmSO2);
+		sprintf(SD.vAcquy,"%f", sensor.vAcquy);
+
+		memcpy(SD.filename,"thuong.txt",strlen("thuong.txt")+1);
+		strcat(SD.wdata,dataGps.Latitude);strcat(SD.wdata," ");
+		strcat(SD.wdata,dataGps.S_N);strcat(SD.wdata," ");
+		strcat(SD.wdata,dataGps.Longtitude);strcat(SD.wdata," ");
+		strcat(SD.wdata,dataGps.E_W);strcat(SD.wdata," ");
+
+		strcat(SD.wdata,SD.pm1p0);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.pm2p5);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.pm10);strcat(SD.wdata," ");
+		
+
+		strcat(SD.wdata,SD.ppmCO);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.ppmNO2);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.ppmSO2);strcat(SD.wdata," ");
+
+		strcat(SD.wdata,SD.vAcquy);strcat(SD.wdata," ");
+		strcat(SD.wdata,"\r");

@@ -1,5 +1,6 @@
 #include "pms7003.h"
 struct PMS7003_Data pms7003;
+extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 /**
   * @brief  Bat dau ngat nhan 1 ki tu
@@ -62,7 +63,7 @@ int PMS7003_ReceiveData(UART_HandleTypeDef* handle){
 			pms7003.checksum = ((pms7003.uartBuf[29] << 8) + pms7003.uartBuf[30]);
 			for(int i = 0; i < 31; i++){
 				pms7003.uartBuf[i] = 0;
-			}
+		}
 		pms7003.state = PMS7003_RECEIVED;
 		}
 		else{ 

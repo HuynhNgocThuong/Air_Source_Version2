@@ -31,31 +31,24 @@ struct nmeaMessage_t{
 	uint8_t GPS_Counter_Tmp;
 	uint8_t GPS_Flag;
 };
-struct dataGps_t{
+typedef struct {
 		//Data GPS
-	char Status[2];
-	char Time[20];
-	char Latitude[10];
+	bool Status;
+	char Latitude[11];
 	char S_N[2];
-	char Longtitude[11];
+	char Longtitude[12];
 	char E_W[2];
 	char Speed[20];
-	char Date[20];
+	char Location[50];
 	float Velocity;
-};
-struct statusGps_t{
-	unsigned char GPS_ans_stt;
-	unsigned char GPS_send_error;
-	unsigned char GPS_receive_error;
-};
+}dataGps_t;
 /*________________________________GPS_Prototype_________________________________*/
  /*____________________________________________________________________________*/
-unsigned char GPS_Data(char* time, char* status, char* latitude, char* S_N, 
-														 char* longitude, char* E_W, char* speed, char* date);
+bool GPS_Data(dataGps_t* handle);
 void GPS_ClearData(void);
 void GPS_ClearRxBuffer(void);
 int  GPS_SearchChar(unsigned char Char, char *Str, unsigned char Time, int Len);
 void GPS_DeleteChar(char s[], int pos);
-void GPS_RawData(void);
+bool GPS_RawData(void);
 void GPS_Knot2Kmh(char * knot, float * km_h);
 #endif /* _GPSNEO_H_ */

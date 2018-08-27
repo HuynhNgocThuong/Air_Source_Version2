@@ -1,4 +1,5 @@
 #include "RTC.h"
+#define DEBUG 1
 DS3231_t DS3231;
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
@@ -150,7 +151,8 @@ void RTC_ArmedAlarm1(bool armed){
 	value = RTC_BCD2DEC(I2C_ReadByte(hi2c1,(uint16_t) DS3231_ADDRESS, DS3231_REG_CONTROL));
 	 if (armed)
     {
-        value |= 0x01;
+        value |= 0x05;
+				value &= 0xFD;
     } else
     {
         value &= 0xFE;

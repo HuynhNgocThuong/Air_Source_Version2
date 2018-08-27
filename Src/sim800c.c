@@ -55,9 +55,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		UARTSim.Rx_temp[UARTSim.Rx_indx++] = UARTSim.Rx_data[0];
 				//CALL
 				if(strstr(UARTSim.Rx_temp,"RING")){
-				#ifdef DEBUG
 				printf("%s",UARTSim.Rx_temp);
-				#endif
 				//SIM_sendCommand("ATH");
 				SIM_Delete_Reply();
 				dataSMS.count_Sc = 0;
@@ -75,9 +73,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 				for(int i = 0; i< strlen(UARTSim.Rx_temp); i++) dataSMS.sms_buffer[i] = UARTSim.Rx_temp[i];
 				SIM_Delete_Reply();
 				UARTSim.Rx_indx = 0;
-				#ifdef DEBUG
 				printf("%s\r\n",dataSMS.sms_buffer);
-			  #endif
 				//Coppy current buf to sms buf for processing	
 			}
 				}
@@ -99,9 +95,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			if(UARTSim.Rx_Flagres == 1){
 			if((indexOf(UARTSim.Rx_temp, UARTSim.Response_ex)) && !dataSMS.readSMS){
 			for(int i = 0; i < strlen(UARTSim.Rx_temp); i++) dataGPRS.reply[i] = UARTSim.Rx_temp[i];	
-			SIM_Delete_Reply();
 			UARTSim.Rx_Flagres = 0;
 			UARTSim.Rx_indx = 0;
+			SIM_Delete_Reply();
+			SIM_Delete_ResponseEx();				
 			}
 		}
    HAL_UART_Receive_IT(&huart1,(uint8_t *)UARTSim.Rx_data, 1); 		
@@ -198,7 +195,6 @@ char* SIM_replyCommand(int _timeout){
 	#ifdef DEBUG
 	printf("%s",UARTSim.Rx_temp);
 	#endif
-	HAL_Delay(200);
 	return UARTSim.Rx_temp;
 }
 /**
@@ -210,6 +206,8 @@ char* SIM_replyCommand(int _timeout){
   */
 char* SIM_replyCommandResponse(int _timeout, char* expected_answer){
 			uint32_t t = HAL_GetTick();
+			strcpy(UARTSim.Response_ex, expected_answer);
+			UARTSim.Rx_Flagres = 1;
 	do{
 		if(strstr(dataGPRS.reply, expected_answer)){
 			printf("---------------------------------------\r\n");
@@ -463,6 +461,95 @@ void SIM_getHTTP(char* _Parameter, uint8_t date, uint8_t month, uint8_t year,
 	
 	dataSMS.readSMS = 1 ;
 	
+}
+/**
+  * @brief  function transfer data by TCP GET protocol
+	* @param  Location: 1603.61665xNx10814.32328xE
+	*					date, month, year, hour, minute, second, pm1p0, pm2p5, pm10, so2, no2, co, baterry
+	*            
+	* @note
+  * @retval none
+  */		
+bool SIM_connectTCP(void){
+	dataSMS.readSMS = 0;		
+	SIM_sendCommand("AT+CIPSTART=\"TCP\",\"nckhbkdn.tapit.vn\",\"80\"");
+	SIM_replyCommand(5000);
+	SIM_Delete_Reply();
+	if(indexOf(SIM_replyCommandResponse(5000,"CONNECT OK\r\n"),"ERROR")){
+	SIM_Delete_Reply();
+	SIM_Delete_BufReply();
+	return false;
+	}
+	SIM_Delete_Reply();
+	SIM_Delete_BufReply();
+	dataSMS.readSMS = 1;		
+	return true;
+}
+bool SIM_getTCP(char* Location, uint8_t date, uint8_t month, uint8_t year, 
+										uint8_t hour, uint8_t minute, uint8_t second, uint8_t pm1p0, 
+										uint8_t pm2p5, uint8_t pm10, uint8_t so2, uint8_t no2, uint8_t co, uint8_t battery){
+	dataSMS.readSMS = 0;
+	SIM_sendCommandResponse("AT+CIPSEND",">");SIM_replyCommandResponse(5000,">");SIM_Delete_Reply();SIM_Delete_BufReply();
+	SIM_Send("GET /");
+	SIM_Send("Content/web2/get_location.php");
+	SIM_Send("?raw_var=");
+	SIM_Send(Location);
+	SIM_Send("&date_time=");
+	SIM_Send_Int(year);
+	SIM_Send("-");
+	SIM_Send_Int(month);
+	SIM_Send("-");
+  SIM_Send_Int(date);
+	SIM_Send("%20");
+	SIM_Send_Int(hour);
+	SIM_Send(":");
+	SIM_Send_Int(minute);
+	SIM_Send(":");
+	SIM_Send_Int(second);
+  
+	SIM_Send("&pms1p0=");
+	SIM_Send_Int(pm1p0);
+	SIM_Send("&pms2p5=");
+	SIM_Send_Int(pm2p5);
+	SIM_Send("&pms10=");
+	SIM_Send_Int(pm10);
+	SIM_Send("&so2=");
+	SIM_Send_Int(so2);
+	SIM_Send("&no2=");
+	SIM_Send_Int(no2);
+	SIM_Send("&co=");
+	SIM_Send_Int(co);
+	SIM_Send("&battery=");
+	SIM_Send_Int(battery);
+	
+	SIM_Send(" HTTP/1.1\r\n"); 
+  SIM_Send("Host: ");
+  SIM_Send("nckhbkdn.tapit.vn");
+  SIM_Send("\r\n");
+  SIM_Send("Connection: Keep-Alive\r\n\r\n");    
+  SIM_Send("\x1A");
+	if(indexOf(SIM_replyCommandResponse(10000,"Keep-Alive\r\n"),"ERROR")){
+	SIM_Delete_BufReply();
+	SIM_Delete_Reply();
+	SIM_Delete_ResponseEx();	
+	return false;
+	}
+	SIM_Delete_BufReply();
+	SIM_replyCommandResponse(30000,"CLOSED\r\n");SIM_Delete_BufReply();
+	
+	dataSMS.readSMS = 1;	
+  return true; 	
+}
+bool SIM_disconnectTCP(void){
+	dataSMS.readSMS = 0;		
+	SIM_sendCommand("AT+CIPSHUT");
+	if(indexOf(SIM_replyCommand(5000),"ERROR")){
+	SIM_Delete_Reply();
+	return false;
+	}
+	SIM_Delete_Reply();
+	dataSMS.readSMS = 1;		
+	return true;
 }
 /**
   * @brief  delete all message in sim800c

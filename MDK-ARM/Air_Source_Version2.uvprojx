@@ -481,6 +481,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\sim800c.c</FilePath>
             </File>
+            <File>
+              <FileName>Text.txt</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Text.txt</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

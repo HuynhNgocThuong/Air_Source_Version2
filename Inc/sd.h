@@ -38,8 +38,23 @@ typedef struct sd_info {
 struct sd_data{
 	uint8_t size;
 	uint8_t rdata[1000];
-  char wdata[100];
+  char wdata[300];
+	char pm1p0[15];
+	char pm2p5[15];
+	char pm10[15];
+	char ppmSO2[15];
+	char ppmNO2[15];
+	char ppmCO[15];
+	char vAcquy[15];
+	
+	char date[5];
+	char month[5];
+	char year[5];
+	char hour[5];
+	char minute[5];
+	char second[5];
 	char filename[];
+
 };
 //--------------------------------------------------
 //FATFS SDFatFs; //File system object structure (FATFS)
@@ -60,5 +75,6 @@ void SD_Write_File(const char* filename, const char* buffer, uint8_t size);
 uint8_t* SD_Read_File(const char* filename);
 void SD_List_File(void);
 unsigned long SD_Amount_Space(void);
-
+void SD_Push_Data(char* filename,uint8_t date, uint8_t month, uint8_t year, uint8_t hour, uint8_t minute, uint8_t second, char* latitude, char* s_n, char* longtitude, char* e_w, 
+		uint8_t pm10, uint8_t pm1p0, uint8_t pm2p5, float ppmco, float ppmno2, float ppmso2, float acquy);
 #endif /* SD_H_ */

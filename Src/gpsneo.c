@@ -1,14 +1,13 @@
 #include "gpsneo.h"
 extern UART_HandleTypeDef huart2;
-#define DEBUG 1
+//#define DEBUG 1
 //-----------------------------------Variable----------------------------------//
  //---------------------------------------------------------------------------//
 char ch; 
 //------------------------------------Struct-----------------------------------//
 //-----------------------------------------------------------------------------//
 struct nmeaMessage_t 	nmeaMessage;
-struct dataGps_t 			dataGps;
-struct statusGps_t		statusGps;
+dataGps_t 	dataGps;
 
 /**
   * @brief  Ham xoa 1 ki tru trong chuoi
@@ -78,13 +77,13 @@ void GPS_ClearData(void){
   *                 
   * @retval false or true
   */
-unsigned char GPS_Data(char* time, char* status, char* latitude, char* S_N, char* longitude, char* E_W, char* speed, char* date){
+bool GPS_Data(dataGps_t* handle){
 	int k = 0;
 	int Temp1, Temp2;
 	Temp2 = GPS_SearchChar(',',nmeaMessage.GPS_RX_Buffer,2,GPS_BUFFER_SIZE);	
 	if(nmeaMessage.GPS_RX_Buffer[Temp2] == 'V'){
-		return 0;
-	}
+		return false;
+}
 	else{
 //-------------------------------------------------------------------------------------------------		
     //LATITUDE
@@ -99,52 +98,51 @@ unsigned char GPS_Data(char* time, char* status, char* latitude, char* S_N, char
 //		printf("Ki tu Temp2-1: %c\r\n",nmeaMessage.GPS_RX_Buffer[Temp2-1]);
 		#endif
 		for(int i = Temp1; i < Temp2-1; i++){
-			dataGps.Latitude[k++] = nmeaMessage.GPS_RX_Buffer[i];
+			handle->Latitude[k++] = nmeaMessage.GPS_RX_Buffer[i];
 		}
 		#ifdef DEBUG
 //		printf("Ki tu cuoi Lat: %c\r\n",dataGps.Latitude[k-1]);
 		#endif
 		k = 0;
 		if(nmeaMessage.GPS_RX_Buffer[Temp2] == 'N'){
-			dataGps.S_N[0] = 'N';
+			handle->S_N[0] = 'N';
 		}
 		else{
-			dataGps.S_N[0] = 'S';
+			handle->S_N[0] = 'S';
 		}
 //-------------------------------------------------------------------------------------------------				
     //LONGTITUDE
 		Temp1 = GPS_SearchChar(',',nmeaMessage.GPS_RX_Buffer,5,GPS_BUFFER_SIZE);	
 		Temp2 = GPS_SearchChar(',',nmeaMessage.GPS_RX_Buffer,6,GPS_BUFFER_SIZE);	
 		for(int i = Temp1 ; i < Temp2-1; i++){
-			dataGps.Longtitude[k++] = nmeaMessage.GPS_RX_Buffer[i];
+			handle->Longtitude[k++] = nmeaMessage.GPS_RX_Buffer[i];
 		}
 		k = 0;
 		if(nmeaMessage.GPS_RX_Buffer[Temp2]=='E'){
-			dataGps.E_W[0] = 'E';
+			handle->E_W[0] = 'E';
 		}
 		else{
-			dataGps.E_W[0] = 'W';
+			handle->E_W[0] = 'W';
 		}
 //-------------------------------------------------------------------------------------------------			
 		//VELOCITY
 		Temp1 = GPS_SearchChar(',',nmeaMessage.GPS_RX_Buffer,7,GPS_BUFFER_SIZE);	 
 		Temp2 = GPS_SearchChar(',',nmeaMessage.GPS_RX_Buffer,8,GPS_BUFFER_SIZE);
 		for(int i = Temp1; i < Temp2-1; i++){
-			dataGps.Speed[k++] = nmeaMessage.GPS_RX_Buffer[i];
+			handle->Speed[k++] = nmeaMessage.GPS_RX_Buffer[i];
 		}
 		k = 0;
-		GPS_Knot2Kmh(dataGps.Speed, &dataGps.Velocity);
-	return 1;	
+		GPS_Knot2Kmh(handle->Speed, &handle->Velocity);
+	return true;	
 	}
 }
-
 /**
   * @brief  Ham raw data (break khi nhan het cau lenh $GPRMC)
 	* @param  Khong
   *                 
   * @retval Khong
   */
-void GPS_RawData(void){
+bool GPS_RawData(void){
 	while(1){
 		//Khi co du lieu tu Shift register truyen vao Rx buffer thi RXNE flag set
   if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) != RESET){
@@ -195,11 +193,10 @@ if (ch == '*'){
 		if (nmeaMessage.GPS_Flag == 3){
 			nmeaMessage.GPS_Flag = 0;
 	    nmeaMessage.GPS_Counter = 0;
-			printf("%s\r\n", nmeaMessage.GPS_RX_Buffer);
-			statusGps.GPS_ans_stt = GPS_Data(dataGps.Time, dataGps.Status, dataGps.Latitude, dataGps.S_N, 
-																				 dataGps.Longtitude, dataGps.E_W, dataGps.Speed, dataGps.Date);
+		dataGps.Status = GPS_Data(&dataGps);
 			#ifdef DEBUG
-			if(statusGps.GPS_ans_stt){	
+			if(dataGps.Status){	
+				printf("%s\r\n", nmeaMessage.GPS_RX_Buffer);
 				printf("%s\r\n",dataGps.Latitude);
 				printf("%s\r\n",dataGps.S_N);
 				printf("%s\r\n",dataGps.Longtitude);
@@ -213,6 +210,7 @@ if (ch == '*'){
 				printf("Not connect yet\r\n");
 			}
 			#endif
+			return dataGps.Status ;
 			break;
 			}
 	}		

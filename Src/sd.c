@@ -16,7 +16,7 @@
 #define CMD58 (0x40+58) // READ_OCR
 //--------------------------------------------------
 extern SPI_HandleTypeDef hspi2;
-extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart3;
 sd_info_ptr sdinfo;
 //-------------------------------------------------- Delecrare variable
 
@@ -187,7 +187,7 @@ uint8_t sd_ini(void)
 			for (i = 0; i < 4; i++) ocr[i] = SPI_ReceiveByte();
 			sprintf(str1,"OCR: 0x%02X 0x%02X 0x%02X 0x%02X\r\n",ocr[0],ocr[1],ocr[2],ocr[3]);
 			#ifdef DEBUG
-			HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
+			HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);
 			#endif
 			// Get trailing return value of R7 resp 
 			//Check nguong dien ap hoat dong sd card
@@ -199,7 +199,7 @@ uint8_t sd_ini(void)
 					for (i = 0; i < 4; i++) ocr[i] = SPI_ReceiveByte();
 					sprintf(str1,"OCR: 0x%02X 0x%02X 0x%02X 0x%02X\r\n",ocr[0],ocr[1],ocr[2],ocr[3]);
 					#ifdef DEBUG
-					HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
+					HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);
 					#endif
 						//Kiem tra neu 8bit OCR dau tien la Low voltage range thi SDv2 (0x04) + CT_BLOCK (0x08)
 					sdinfo.type = (ocr[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2; // SDv2 (HC or SC)
@@ -227,7 +227,7 @@ uint8_t sd_ini(void)
   }
   sprintf(str1,"Type SD: 0x%02X\r\n",sdinfo.type);
 	#ifdef DEBUG
-  HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);	   
+  HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);	   
 	#endif	
   return 0;
 }
@@ -239,7 +239,7 @@ FRESULT ReadLongFile(void)
   uint32_t f_size = MyFile.fsize;
   sprintf(str1,"fsize: %lu\r\n",(unsigned long)f_size);
 	#ifdef DEBUG
-  HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
+  HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);
 	#endif
   ind=0;
   do
@@ -259,14 +259,14 @@ FRESULT ReadLongFile(void)
     {
 			//SD.rdata mang 1000 phan tu
 			#ifdef DEBUG
-      HAL_UART_Transmit(&huart2, SD.rdata+i, 1, 0x1000);
+      HAL_UART_Transmit(&huart3, SD.rdata+i, 1, 0x1000);
 			#endif
     }
     ind+=i1;
   }
   while(f_size>0);
 	#ifdef DEBUG
-  HAL_UART_Transmit(&huart2,(uint8_t*)"\r\n",2,0x1000);
+  HAL_UART_Transmit(&huart3,(uint8_t*)"\r\n",2,0x1000);
 	#endif
   return FR_OK;
 }
@@ -337,24 +337,24 @@ void SD_List_File(void){
 					//khi truyen buffer vao HAL_UART thi truyen vao dia chi dau tien cua mang se liet ke het danh sach cac file co trong SD
 					if(strlen(fn)){
 					#ifdef DEBUG
-					HAL_UART_Transmit(&huart2,(uint8_t*)fn,strlen(fn),0x1000);
+					HAL_UART_Transmit(&huart3,(uint8_t*)fn,strlen(fn),0x1000);
 					#endif
 					}
 					else {
 					#ifdef DEBUG 
-					HAL_UART_Transmit(&huart2,(uint8_t*)fileInfo.fname,strlen((char*)fileInfo.fname),0x1000); 
+					HAL_UART_Transmit(&huart3,(uint8_t*)fileInfo.fname,strlen((char*)fileInfo.fname),0x1000); 
 					#endif
 					}
 					if(fileInfo.fattrib&AM_DIR)
 					{
 						#ifdef DEBUG 
-						HAL_UART_Transmit(&huart2,(uint8_t*)"  [DIR]",7,0x1000);
+						HAL_UART_Transmit(&huart3,(uint8_t*)"  [DIR]",7,0x1000);
 						#endif
 					}					
 				}
 				else break;
 				#ifdef DEBUG
-				HAL_UART_Transmit(&huart2,(uint8_t*)"\r\n",2,0x1000);
+				HAL_UART_Transmit(&huart3,(uint8_t*)"\r\n",2,0x1000);
 				#endif
 			}
 			f_closedir(&dir);
@@ -365,31 +365,75 @@ unsigned long SD_Amount_Space(void){
 	f_getfree("/", &fre_clust, &fs); /* Get Number of Free Clusters                                           */
 	sprintf(str1,"fre_clust: %lu\r\n",fre_clust);
 	#ifdef DEBUG
-	HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
+	HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);
 	#endif
 	sprintf(str1,"n_fatent: %lu\r\n",fs->n_fatent);
 	#ifdef DEBUG
-	HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
+	HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);
 	#endif
 	sprintf(str1,"fs_csize: %d\r\n",fs->csize);
 	#ifdef DEBUG
-	HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
+	HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);
 	#endif
 	tot_sect = (fs->n_fatent - 2) * fs->csize; /* Number of FAT entries, = number of clusters + 2 */
 	sprintf(str1,"tot_sect: %lu\r\n",tot_sect);
 	#ifdef DEBUG
-	HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
+	HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);
 	#endif
 	fre_sect = fre_clust * fs->csize;
 	sprintf(str1,"fre_sect: %lu\r\n",fre_sect);
 	#ifdef DEBUG
-	HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
+	HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);
 	#endif
 	sprintf(str1, "%lu KB tong dung luong sd.\r\n%lu KB dung luong con lai.\r\n",
 	tot_sect/2, fre_sect/2);
 	#ifdef DEBUG
-	HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
+	HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);
 	#endif
 	FATFS_UnLinkDriver(USERPath);
 	return fre_sect;
+}
+
+void SD_Push_Data(char* filename,uint8_t date, uint8_t month, uint8_t year, uint8_t hour, uint8_t minute, uint8_t second, char* latitude, char* s_n, char* longtitude, char* e_w, 
+		uint8_t pm10, uint8_t pm1p0, uint8_t pm2p5, float ppmco, float ppmno2, float ppmso2, float acquy){
+	  sprintf(SD.date, "%d", date);
+		sprintf(SD.month, "%d", month);
+		sprintf(SD.year, "%d", year);
+		sprintf(SD.hour, "%d", hour);
+		sprintf(SD.minute, "%d", minute);
+		sprintf(SD.second, "%d", second);
+//		sprintf(SD.pm10, "%d", pm10);
+//		sprintf(SD.pm1p0, "%d", pm1p0);
+//		sprintf(SD.pm2p5, "%d", pm2p5);
+//		sprintf(SD.ppmCO, "%f", ppmco);
+//		sprintf(SD.ppmNO2, "%f", ppmno2);
+//		sprintf(SD.ppmSO2, "%f", ppmso2);
+//		sprintf(SD.vAcquy, "%f", acquy);
+
+		memcpy(SD.filename, filename, strlen(filename)+1);
+			
+		strcat(SD.wdata,SD.date);strcat(SD.wdata,"-");
+		strcat(SD.wdata,SD.month);strcat(SD.wdata,"-");
+		strcat(SD.wdata,SD.year);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.hour);strcat(SD.wdata,":");
+		strcat(SD.wdata,SD.minute);strcat(SD.wdata,":");
+		strcat(SD.wdata,SD.second);strcat(SD.wdata," ");
+
+//		
+//		strcat(SD.wdata,latitude);strcat(SD.wdata," ");
+//		strcat(SD.wdata, s_n);strcat(SD.wdata," ");
+//		strcat(SD.wdata,longtitude);strcat(SD.wdata," ");
+//		strcat(SD.wdata, e_w);strcat(SD.wdata," ");
+//		
+//		strcat(SD.wdata,SD.pm1p0);strcat(SD.wdata," ");
+//		strcat(SD.wdata,SD.pm2p5);strcat(SD.wdata," ");
+//		strcat(SD.wdata,SD.pm10);strcat(SD.wdata," ");
+//		
+
+//		strcat(SD.wdata,SD.ppmCO);strcat(SD.wdata," ");
+//		strcat(SD.wdata,SD.ppmNO2);strcat(SD.wdata," ");
+//		strcat(SD.wdata,SD.ppmSO2);strcat(SD.wdata," ");
+//		strcat(SD.wdata,SD.vAcquy);strcat(SD.wdata," ");
+		strcat(SD.wdata,"\r");
+		SD.size = strlen(SD.wdata);	
 }

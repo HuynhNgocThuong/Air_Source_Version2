@@ -24,7 +24,7 @@ struct UARTSim_t{
 	uint8_t Rx_Flagres;
 };
 struct dataGPRS_t{
-	char reply[256];
+	char reply[400];
 };
 struct dataCALL_t{
 	char call_buffer[128];
@@ -62,7 +62,13 @@ void SIM_readserverResponse(void);
 void SIM_getHTTP(char* _Parameter, uint8_t date, uint8_t month, uint8_t year, 
 										uint8_t hour, uint8_t minute, uint8_t second, uint8_t pm1p0, 
 										uint8_t pm2p5, uint8_t pm10, uint8_t so2, uint8_t no2, uint8_t co, uint8_t battery);
-//SMS_Function
+//------------------------------------- get TCP
+bool SIM_connectTCP(void);
+bool SIM_getTCP(char* Location, uint8_t date, uint8_t month, uint8_t year, 
+										uint8_t hour, uint8_t minute, uint8_t second, uint8_t pm1p0, 
+										uint8_t pm2p5, uint8_t pm10, uint8_t so2, uint8_t no2, uint8_t co, uint8_t battery);
+bool SIM_disconnectTCP(void);
+//------------------------------------- SMS_Function
 void SIM_deleteMessage(void);
 void SIM_smsFormat(void);
 void SIM_sendSMS(char* targetNumber, char* message);
