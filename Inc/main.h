@@ -81,6 +81,21 @@
 #define LED2_Pin GPIO_PIN_9
 #define LED2_GPIO_Port GPIOB
 
+#define SIM_Sleep HAL_GPIO_WritePin(DTR_SIM_GPIO_Port, DTR_SIM_Pin, GPIO_PIN_SET)
+#define SIM_Wakeup HAL_GPIO_WritePin(DTR_SIM_GPIO_Port, DTR_SIM_Pin, GPIO_PIN_RESET)
+
+#define C3V_Off HAL_GPIO_WritePin(C3_3V_GPIO_Port, C3_3V_Pin, GPIO_PIN_SET)
+#define C3V_On HAL_GPIO_WritePin(C3_3V_GPIO_Port, C3_3V_Pin, GPIO_PIN_RESET)
+#define C4V_Off HAL_GPIO_WritePin(C4V_GPIO_Port, C4V_Pin, GPIO_PIN_SET)
+#define C4V_On HAL_GPIO_WritePin(C4V_GPIO_Port, C4V_Pin, GPIO_PIN_RESET)
+#define C5V_Off HAL_GPIO_WritePin(C5V_GPIO_Port, C5V_Pin, GPIO_PIN_SET)
+#define C5V_On HAL_GPIO_WritePin(C5V_GPIO_Port, C5V_Pin, GPIO_PIN_RESET)
+
+#define LED1_On HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET)
+#define LED1_Off HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET)
+#define LED2_On HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET)
+#define LED2_Off HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET)
+
 /* ########################## Assert Selection ############################## */
 /**
   * @brief Uncomment the line below to expanse the "assert_param" macro in the 

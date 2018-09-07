@@ -88,3 +88,313 @@ NEO6M
 
 		strcat(SD.wdata,SD.vAcquy);strcat(SD.wdata," ");
 		strcat(SD.wdata,"\r");
+		
+			memcpy(SD.filename,"thuong.txt",strlen("zhuong.txt")+1);
+	memcpy(SD.wdata,"aaaaaa",strlen("aaaaaa"));
+	SD.size = strlen(SD.wdata);
+	//write
+  SD_Write_File(SD.filename, SD.wdata, SD.size);
+	HAL_Delay(5000);
+	SD_Read_File(SD.filename);
+	printf("Thuong\r\n");
+	
+	
+						printf("Frame: %d\r\n ",pms7003.frame);
+					printf("Checksum: %d\r\n ",pms7003.checksum);
+					printf("PM1.0: %d ",pms7003.pm1p0);
+					printf("PM2.5: %d ",pms7003.pm2p5);
+					printf("PM10: %d\r\n",pms7003.pm10);
+					printf("-PM1.0: %d",pms7003.pm1p0_ATM);
+					printf("-PM2.5: %d",pms7003.pm2p5_ATM);
+					printf("-PM10 %d\r\n",pms7003.pm10_ATM);
+					
+					
+					
+					//SD Card
+			/*
+		SD_Push_Data("Thuong.txt",DS3231.date, DS3231.month, DS3231.year, DS3231.hour,DS3231.min,DS3231.sec,dataGps.Latitude,dataGps.S_N,dataGps.Longtitude,dataGps.E_W,pms7003.pm10,
+			pms7003.pm1p0,pms7003.pm2p5,sensor.ppmCO,sensor.ppmNO2,sensor.ppmSO2,sensor.vAcquy);
+		SD.size = strlen(SD.wdata);	
+		SD_Write_File(SD.filename, SD.wdata, SD.size);
+			HAL_Delay(100);
+		SD_Read_File(SD.filename);
+			*/
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			-----------------
+		RTC_GetTime();
+		printf(" %d:%d:%d\r\n", DS3231.hour, DS3231.min, DS3231.sec);	
+			if(DS3231.hour < 18 && DS3231.hour > 5){
+				//-------------------------------------------------------------------------------------	
+					if(DS3231.gprs_hour == DS3231.hour){
+						if(DS3231.min<(DS3231.gprs_min + 1) && DS3231.min >= DS3231.gprs_min){
+				//--------------Get data---------------------------------------------------------------
+					
+					HAL_ADC_Start_DMA(&hadc1, (uint32_t*) sensor.ADC_Raw, 4);
+					while(1){
+						if(PMS7003_ReceiveData(&huart3) == PMS7003_RECEIVED){
+							pms7003.state = PMS7003_CRC_ERROR;
+							break;
+							}
+					}		
+					if(sensor.fAdc){
+						Sensor_Convertdata(&sensor);
+					}
+					//GPS:
+					if(GPS_RawData()){
+					strcat(dataGps.Location,dataGps.Latitude);
+					strcat(dataGps.Location,"x");
+					strcat(dataGps.Location,dataGps.S_N);
+					strcat(dataGps.Location,"x");
+					strcat(dataGps.Location,dataGps.Longtitude);
+					strcat(dataGps.Location,"x");
+					strcat(dataGps.Location,dataGps.E_W);
+				}
+					else{
+					//	goto GPS;
+					}
+		//Connect:	
+				if(SIM_connectTCP()){
+					RTC_GetTime();
+					if(SIM_getTCP(dataGps.Location, DS3231.date, DS3231.month, DS3231.year, DS3231.hour,DS3231.min,DS3231.sec,
+						pms7003.pm1p0,pms7003.pm2p5,pms7003.pm10, sensor.ppmSO2, sensor.ppmNO2, sensor.ppmCO, sensor.vAcquy))
+					{
+					printf("TCP success\r\n");
+					}
+					else{
+					printf("TCP Fail\r\n");	
+					}
+				}
+					else{
+				//	goto Connect;
+					}
+		//Disconnect:
+				if(SIM_disconnectTCP()){
+					printf("Disconnected\r\n");
+				}
+					else{
+					printf("Disconnect Fail\r\n");
+				//		goto Disconnect;
+					}
+				memset(dataGps.Location,'\0',50);
+				GPS_ClearRxBuffer();
+				GPS_ClearData();					
+				//-------------------------------------------------------------------------------------
+							RTC_GetTime();
+							if(DS3231.hour == DS3231.gprs_hour+1){
+								DS3231.gprs_hour = DS3231.hour;
+								DS3231.gprs_min = DS3231.min + 1;
+								
+								if(DS3231.gprs_min >= 60){
+									DS3231.gprs_hour += 1;
+									DS3231.gprs_min = DS3231.gprs_min - 60;
+								}
+								if(DS3231.gprs_hour == 24){ 
+									DS3231.gprs_hour = 0;
+								}
+								printf("1. Gio: %d Phut: %d\r\n",DS3231.gprs_hour, DS3231.gprs_min);
+						}
+							else if(DS3231.hour == 0){
+								DS3231.gprs_hour = DS3231.hour;
+								DS3231.gprs_min = DS3231.min + 1;
+								
+								if(DS3231.gprs_min >= 60){
+									DS3231.gprs_min = DS3231.gprs_min - 60;
+									DS3231.gprs_hour += 1;
+								}
+								printf("2. Gio: %d Phut: %d\r\n",DS3231.gprs_hour, DS3231.gprs_min);
+							}
+							else if(DS3231.hour == DS3231.gprs_hour){
+								DS3231.gprs_hour = DS3231.hour;
+								DS3231.gprs_min = DS3231.min + 1;
+								
+								if(DS3231.gprs_min >= 60){
+									DS3231.gprs_min = DS3231.gprs_min - 60;
+									DS3231.gprs_hour+=1;
+									if(DS3231.gprs_hour == 24){ 
+										DS3231.gprs_hour = 0;
+									}
+								}
+							printf("3. Gio: %d Phut: %d\r\n",DS3231.gprs_hour, DS3231.gprs_min);
+							}
+						}	
+					}
+				}
+	else{			
+		SIM_Sleep;
+		C3V_Off;
+		C5V_Off;
+		printf("MCU enter sleepmode\r\n");
+    HAL_SuspendTick();
+    HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+    HAL_ResumeTick();
+		printf("MCU wakeup from sleepmode\r\n");
+		C3V_On;
+		C5V_On;
+		printf("Turn on 3.3v\r\n");
+	  HAL_Delay(1000);
+		RTC_ClearAlarm1();
+		RTC_GetControl();	
+		RTC_GetTime();
+		DS3231.gprs_hour = DS3231.hour;
+		DS3231.gprs_min = DS3231.min;
+	}	
+	
+		RTC_GetTime();
+		printf(" %d:%d:%d\r\n", DS3231.hour, DS3231.min, DS3231.sec);	
+			if(DS3231.hour < 18 && DS3231.hour > 5){
+				//-------------------------------------------------------------------------------------	
+					if(DS3231.gprs_hour == DS3231.hour){
+						if(DS3231.min<(DS3231.gprs_min + 1) && DS3231.min >= DS3231.gprs_min){
+				//--------------Get data---------------------------------------------------------------
+					
+					HAL_ADC_Start_DMA(&hadc1, (uint32_t*) sensor.ADC_Raw, 4);
+					while(1){
+						if(PMS7003_ReceiveData(&huart3) == PMS7003_RECEIVED){
+							pms7003.state = PMS7003_CRC_ERROR;
+							break;
+							}
+					}		
+					if(sensor.fAdc){
+						Sensor_Convertdata(&sensor);
+					}
+					//GPS:
+					if(GPS_RawData()){
+					strcat(dataGps.Location,dataGps.Latitude);
+					strcat(dataGps.Location,"x");
+					strcat(dataGps.Location,dataGps.S_N);
+					strcat(dataGps.Location,"x");
+					strcat(dataGps.Location,dataGps.Longtitude);
+					strcat(dataGps.Location,"x");
+					strcat(dataGps.Location,dataGps.E_W);
+				}
+					else{
+					//	goto GPS;
+					}
+
+//		//Connect:	
+//				if(SIM_connectTCP()){
+//					RTC_GetTime();
+//					if(SIM_getTCP(dataGps.Location, DS3231.date, DS3231.month, DS3231.year, DS3231.hour,DS3231.min,DS3231.sec,
+//						pms7003.pm1p0,pms7003.pm2p5,pms7003.pm10, sensor.ppmSO2, sensor.ppmNO2, sensor.ppmCO, sensor.vAcquy))
+//					{
+//					printf("TCP success\r\n");
+//					}
+//					else{
+//					printf("TCP Fail\r\n");	
+//					}
+//				}
+//					else{
+//				//	goto Connect;
+//					}
+//		//Disconnect:
+//				if(SIM_disconnectTCP()){
+//					printf("Disconnected\r\n");
+//				}
+//					else{
+//					printf("Disconnect Fail\r\n");
+//				//		goto Disconnect;
+//					}
+				char tenfile[10];
+				char b[2];
+				a++;
+				sprintf(b, "%d", a);
+				strcat(tenfile,b);
+				strcat(tenfile,".txt");
+					
+				SD_Push_Data(DS3231.date, DS3231.month, DS3231.year, DS3231.hour,DS3231.min,DS3231.sec,dataGps.Latitude,dataGps.S_N,dataGps.Longtitude,dataGps.E_W,pms7003.pm10,
+				pms7003.pm1p0,pms7003.pm2p5,sensor.ppmCO,sensor.ppmNO2,sensor.ppmSO2,sensor.vAcquy);
+				SD.size = strlen(SD.wdata);	
+				SD_Write_File(tenfile, SD.wdata, SD.size);	
+				HAL_Delay(1000);
+				SD_Read_File(tenfile);
+				memset(dataGps.Location,'\0',50);
+				memset(SD.wdata,'\0',300);
+				memset(tenfile,'\0',10);
+				GPS_ClearRxBuffer();
+				GPS_ClearData();
+				//-------------------------------------------------------------------------------------
+							RTC_GetTime();
+							if(DS3231.hour == DS3231.gprs_hour+1){
+								DS3231.gprs_hour = DS3231.hour;
+								DS3231.gprs_min = DS3231.min + 1;
+								
+								if(DS3231.gprs_min >= 60){
+									DS3231.gprs_hour += 1;
+									DS3231.gprs_min = DS3231.gprs_min - 60;
+								}
+								if(DS3231.gprs_hour == 24){ 
+									DS3231.gprs_hour = 0;
+								}
+								printf("1. Gio: %d Phut: %d\r\n",DS3231.gprs_hour, DS3231.gprs_min);
+						}
+							else if(DS3231.hour == 0){
+								DS3231.gprs_hour = DS3231.hour;
+								DS3231.gprs_min = DS3231.min + 1;
+								
+								if(DS3231.gprs_min >= 60){
+									DS3231.gprs_min = DS3231.gprs_min - 60;
+									DS3231.gprs_hour += 1;
+								}
+								printf("2. Gio: %d Phut: %d\r\n",DS3231.gprs_hour, DS3231.gprs_min);
+							}
+							else if(DS3231.hour == DS3231.gprs_hour){
+								DS3231.gprs_hour = DS3231.hour;
+								DS3231.gprs_min = DS3231.min + 1;
+								
+								if(DS3231.gprs_min >= 60){
+									DS3231.gprs_min = DS3231.gprs_min - 60;
+									DS3231.gprs_hour+=1;
+									if(DS3231.gprs_hour == 24){ 
+										DS3231.gprs_hour = 0;
+									}
+								}
+							printf("3. Gio: %d Phut: %d\r\n",DS3231.gprs_hour, DS3231.gprs_min);
+							}
+						}	
+					}
+				}
+	else{			
+		SIM_Sleep;
+		C3V_Off;
+		C5V_Off;
+		printf("MCU enter sleepmode\r\n");
+    HAL_SuspendTick();
+    HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+    HAL_ResumeTick();
+		printf("MCU wakeup from sleepmode\r\n");
+		C3V_On;
+		C5V_On;
+		printf("Turn on 3.3v\r\n");
+	  HAL_Delay(1000);
+		RTC_ClearAlarm1();
+		RTC_GetControl();	
+		RTC_GetTime();
+		DS3231.gprs_hour = DS3231.hour;
+		DS3231.gprs_min = DS3231.min;
+	}	
+			HAL_Delay(1000);
+					
+  /* USER CODE END WHILE */
+
+  /* USER CODE BEGIN 3 */

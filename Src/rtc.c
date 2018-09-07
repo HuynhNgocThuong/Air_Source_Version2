@@ -151,6 +151,7 @@ void RTC_ArmedAlarm1(bool armed){
 	value = RTC_BCD2DEC(I2C_ReadByte(hi2c1,(uint16_t) DS3231_ADDRESS, DS3231_REG_CONTROL));
 	 if (armed)
     {
+				value &= 0x00;
         value |= 0x05;
 				value &= 0xFD;
     } else
@@ -232,7 +233,7 @@ void RTC_SetAlarm1(uint8_t dayofweek, uint8_t hour, uint8_t minute, uint8_t seco
 		DS3231.I2C_Buffer[3] = hour;
 		DS3231.I2C_Buffer[4] = dayofweek;
 		I2C_WriteBuffer(hi2c1,(uint16_t)DS3231_ADDRESS,5);
-		HAL_Delay(100);
+
 		RTC_ArmedAlarm1(armed);
     RTC_ClearAlarm1();
 }

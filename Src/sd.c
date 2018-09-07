@@ -394,7 +394,7 @@ unsigned long SD_Amount_Space(void){
 	return fre_sect;
 }
 
-void SD_Push_Data(char* filename,uint8_t date, uint8_t month, uint8_t year, uint8_t hour, uint8_t minute, uint8_t second, char* latitude, char* s_n, char* longtitude, char* e_w, 
+void SD_Push_Data(uint8_t date, uint8_t month, uint8_t year, uint8_t hour, uint8_t minute, uint8_t second, char* latitude, char* s_n, char* longtitude, char* e_w, 
 		uint8_t pm10, uint8_t pm1p0, uint8_t pm2p5, float ppmco, float ppmno2, float ppmso2, float acquy){
 	  sprintf(SD.date, "%d", date);
 		sprintf(SD.month, "%d", month);
@@ -402,15 +402,14 @@ void SD_Push_Data(char* filename,uint8_t date, uint8_t month, uint8_t year, uint
 		sprintf(SD.hour, "%d", hour);
 		sprintf(SD.minute, "%d", minute);
 		sprintf(SD.second, "%d", second);
-//		sprintf(SD.pm10, "%d", pm10);
-//		sprintf(SD.pm1p0, "%d", pm1p0);
-//		sprintf(SD.pm2p5, "%d", pm2p5);
-//		sprintf(SD.ppmCO, "%f", ppmco);
-//		sprintf(SD.ppmNO2, "%f", ppmno2);
-//		sprintf(SD.ppmSO2, "%f", ppmso2);
-//		sprintf(SD.vAcquy, "%f", acquy);
+		sprintf(SD.pm10, "%d", pm10);
+		sprintf(SD.pm1p0, "%d", pm1p0);
+		sprintf(SD.pm2p5, "%d", pm2p5);
+		sprintf(SD.ppmCO, "%.2f", ppmco);
+		sprintf(SD.ppmNO2, "%.2f", ppmno2);
+		sprintf(SD.ppmSO2, "%.2f", ppmso2);
+		sprintf(SD.vAcquy, "%.2f", acquy);
 
-		memcpy(SD.filename, filename, strlen(filename)+1);
 			
 		strcat(SD.wdata,SD.date);strcat(SD.wdata,"-");
 		strcat(SD.wdata,SD.month);strcat(SD.wdata,"-");
@@ -419,21 +418,20 @@ void SD_Push_Data(char* filename,uint8_t date, uint8_t month, uint8_t year, uint
 		strcat(SD.wdata,SD.minute);strcat(SD.wdata,":");
 		strcat(SD.wdata,SD.second);strcat(SD.wdata," ");
 
-//		
-//		strcat(SD.wdata,latitude);strcat(SD.wdata," ");
-//		strcat(SD.wdata, s_n);strcat(SD.wdata," ");
-//		strcat(SD.wdata,longtitude);strcat(SD.wdata," ");
-//		strcat(SD.wdata, e_w);strcat(SD.wdata," ");
-//		
-//		strcat(SD.wdata,SD.pm1p0);strcat(SD.wdata," ");
-//		strcat(SD.wdata,SD.pm2p5);strcat(SD.wdata," ");
-//		strcat(SD.wdata,SD.pm10);strcat(SD.wdata," ");
-//		
+		
+		strcat(SD.wdata,latitude);
+		strcat(SD.wdata, s_n);
+		strcat(SD.wdata,longtitude);
+		strcat(SD.wdata, e_w);strcat(SD.wdata," ");
+		
+		strcat(SD.wdata,SD.pm1p0);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.pm2p5);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.pm10);strcat(SD.wdata," ");
+		
 
-//		strcat(SD.wdata,SD.ppmCO);strcat(SD.wdata," ");
-//		strcat(SD.wdata,SD.ppmNO2);strcat(SD.wdata," ");
-//		strcat(SD.wdata,SD.ppmSO2);strcat(SD.wdata," ");
-//		strcat(SD.wdata,SD.vAcquy);strcat(SD.wdata," ");
-		strcat(SD.wdata,"\r");
-		SD.size = strlen(SD.wdata);	
+		strcat(SD.wdata,SD.ppmCO);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.ppmNO2);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.ppmSO2);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.vAcquy);strcat(SD.wdata," ");
+		strcat(SD.wdata,"\r\n");
 }

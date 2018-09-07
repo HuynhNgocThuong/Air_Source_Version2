@@ -303,7 +303,7 @@ void SIM_begin(void){
 	}while(!(indexOf(SIM_replyCommand(timeout_50),"0,1")));
 	SIM_Delete_Reply();
  //SIM available SleepMode1
-	SIM_sendCommand("AT+CSCLK=0");SIM_replyCommand(timeout_5);SIM_Delete_Reply();
+	SIM_sendCommand("AT+CSCLK=1");SIM_replyCommand(timeout_5);SIM_Delete_Reply();
 	//Turn off USSD
 	SIM_sendCommand("AT+CUSD=0");SIM_replyCommand(timeout_5);SIM_Delete_Reply();
 	SIM_sendCommand("AT&F0");SIM_replyCommand(timeout_5);SIM_Delete_Reply();
@@ -371,12 +371,14 @@ bool SIM_initHTTP(void){
   */
 bool SIM_disconnectGPRS(){
 	dataSMS.readSMS = 0;
-	SIM_sendCommand("AT+HTTPTERM");
+	//AT+HTTPTERM
+	SIM_sendCommand("AT+FTPQUIT");
   SIM_replyCommand(timeout_5);SIM_Delete_Reply();
-	SIM_sendCommand("AT+SAPBR=0,1");
+	SIM_sendCommand("AT+CIPSHUT");
 	if(indexOf(SIM_replyCommand(10000),"ERROR")){ SIM_Delete_Reply();return false;}
 	SIM_Delete_Reply();
-	SIM_sendCommand("AT+CGATT=0");
+	//AT+CGATT=0
+	SIM_sendCommand("AT+SAPBR=0,1");
 	if(indexOf(SIM_replyCommand(10000),"ERROR")){ SIM_Delete_Reply();return false;}
 	SIM_Delete_Reply();
 	dataSMS.readSMS = 1;
@@ -615,7 +617,6 @@ void SIM_sendSMS(char* targetNumber, char* message){
 	SIM_replyCommand(1000);
 	SIM_Delete_Reply();
 
-	
 	dataSMS.readSMS = 1;
 	
 }
