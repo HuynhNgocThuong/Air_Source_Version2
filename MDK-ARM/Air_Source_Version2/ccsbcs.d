@@ -1,6 +1,6 @@
-air_source_version2\ccsbcs.o: ..\Middlewares\Third_Party\FatFs\src\option\ccsbcs.c
-air_source_version2\ccsbcs.o: ..\Middlewares\Third_Party\FatFs\src\option\../ff.h
-air_source_version2\ccsbcs.o: ..\Middlewares\Third_Party\FatFs\src\option\../integer.h
+air_source_version2\ccsbcs.o: ../Middlewares/Third_Party/FatFs/src/option/ccsbcs.c
+air_source_version2\ccsbcs.o: ../Middlewares/Third_Party/FatFs/src/option/../ff.h
+air_source_version2\ccsbcs.o: ../Middlewares/Third_Party/FatFs/src/option/../integer.h
 air_source_version2\ccsbcs.o: ../Inc/ffconf.h
 air_source_version2\ccsbcs.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 air_source_version2\ccsbcs.o: ../Inc/stm32f1xx_hal_conf.h

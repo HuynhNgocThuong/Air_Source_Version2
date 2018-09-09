@@ -202,7 +202,17 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>text</ItemText>
+          <ItemText>UARTSim.Rx_temp</ItemText>
+        </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>UARTSim.Response_ex</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>SD.data</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

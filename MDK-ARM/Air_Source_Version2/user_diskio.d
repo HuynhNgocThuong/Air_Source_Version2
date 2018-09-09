@@ -38,3 +38,4 @@ air_source_version2\user_diskio.o: ../Inc/sd.h
 air_source_version2\user_diskio.o: ../Inc/fatfs.h
 air_source_version2\user_diskio.o: ../Inc/user_diskio.h
 air_source_version2\user_diskio.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+air_source_version2\user_diskio.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h

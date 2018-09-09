@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 //--------------------------------------------------
 #define LD_ON HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET); //RED
 #define LD_OFF HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); //RED
@@ -37,7 +38,8 @@ typedef struct sd_info {
 } sd_info_ptr;
 struct sd_data{
 	uint8_t size;
-	uint8_t rdata[1000];
+	uint8_t rdata[512];
+	char data[512];
   char wdata[300];
 	char pm1p0[15];
 	char pm2p5[15];
@@ -45,7 +47,7 @@ struct sd_data{
 	char ppmSO2[15];
 	char ppmNO2[15];
 	char ppmCO[15];
-	char vAcquy[15];
+	char pAcquy[15];
 	
 	char date[5];
 	char month[5];
@@ -53,7 +55,7 @@ struct sd_data{
 	char hour[5];
 	char minute[5];
 	char second[5];
-	char filename[];
+	char filename[50];
 
 };
 //--------------------------------------------------
@@ -76,5 +78,9 @@ uint8_t* SD_Read_File(const char* filename);
 void SD_List_File(void);
 unsigned long SD_Amount_Space(void);
 void SD_Push_Data(uint8_t date, uint8_t month, uint8_t year, uint8_t hour, uint8_t minute, uint8_t second, char* latitude, char* s_n, char* longtitude, char* e_w, 
-		uint8_t pm10, uint8_t pm1p0, uint8_t pm2p5, float ppmco, float ppmno2, float ppmso2, float acquy);
+		uint16_t pm10, uint16_t pm1p0, uint16_t pm2p5, float ppmco, float ppmno2, float ppmso2, float acquy);
+void SD_Filename(uint8_t date, uint8_t month, uint8_t year, uint8_t hour);
+void SD_Frame2(char* buffer, uint16_t count);
+void SD_Frame3(char* buffer, uint16_t count);
+void SD_Frame33(char* buffer, float count);
 #endif /* SD_H_ */

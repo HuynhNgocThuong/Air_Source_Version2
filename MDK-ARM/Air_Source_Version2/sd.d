@@ -38,3 +38,4 @@ air_source_version2\sd.o: ../Middlewares/Third_Party/FatFs/src/diskio.h
 air_source_version2\sd.o: ../Inc/user_diskio.h
 air_source_version2\sd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 air_source_version2\sd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+air_source_version2\sd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h

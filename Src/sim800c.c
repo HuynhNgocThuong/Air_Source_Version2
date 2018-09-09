@@ -372,8 +372,8 @@ bool SIM_initHTTP(void){
 bool SIM_disconnectGPRS(){
 	dataSMS.readSMS = 0;
 	//AT+HTTPTERM
-	SIM_sendCommand("AT+FTPQUIT");
-  SIM_replyCommand(timeout_5);SIM_Delete_Reply();
+//	SIM_sendCommand("AT+FTPQUIT");
+//  SIM_replyCommand(timeout_5);SIM_Delete_Reply();
 	SIM_sendCommand("AT+CIPSHUT");
 	if(indexOf(SIM_replyCommand(10000),"ERROR")){ SIM_Delete_Reply();return false;}
 	SIM_Delete_Reply();
@@ -488,8 +488,8 @@ bool SIM_connectTCP(void){
 	return true;
 }
 bool SIM_getTCP(char* Location, uint8_t date, uint8_t month, uint8_t year, 
-										uint8_t hour, uint8_t minute, uint8_t second, uint8_t pm1p0, 
-										uint8_t pm2p5, uint8_t pm10, uint8_t so2, uint8_t no2, uint8_t co, uint8_t battery){
+										uint8_t hour, uint8_t minute, uint8_t second, uint16_t pm1p0, 
+										uint16_t pm2p5, uint16_t pm10, uint16_t so2, uint16_t no2, uint16_t co, uint8_t battery){
 	dataSMS.readSMS = 0;
 	SIM_sendCommandResponse("AT+CIPSEND",">");SIM_replyCommandResponse(5000,">");SIM_Delete_Reply();SIM_Delete_BufReply();
 	SIM_Send("GET /");
@@ -538,6 +538,7 @@ bool SIM_getTCP(char* Location, uint8_t date, uint8_t month, uint8_t year,
 	}
 	SIM_Delete_BufReply();
 	SIM_replyCommandResponse(30000,"CLOSED\r\n");SIM_Delete_BufReply();
+	//SIM_replyCommandResponse(5000,"GDpOK<br>");SIM_Delete_BufReply();
 	
 	dataSMS.readSMS = 1;	
   return true; 	
@@ -678,38 +679,38 @@ void SIM_GetSMS(void){
 	* @note
   * @retval none
   */
-void SIM_SendFTP(void){
+void SIM_SendFTP(char* data){
 	dataSMS.readSMS = 0;
 	SIM_sendCommand("AT+FTPCID=1");SIM_replyCommand(timeout_50);SIM_Delete_Reply();
 	SIM_sendCommand("AT+FTPSERV=\"nckhbkdn.tapit.vn\"");SIM_replyCommand(timeout_50);SIM_Delete_Reply();
 	SIM_sendCommand("AT+FTPUN=\"ngocthuong\"");SIM_replyCommand(timeout_50);SIM_Delete_Reply();
 	SIM_sendCommand("AT+FTPPW=\"02081996\"");SIM_replyCommand(timeout_50);SIM_Delete_Reply();
-	SIM_sendCommand("AT+FTPPUTNAME=\"testmach.txt\"");SIM_replyCommand(timeout_50);SIM_Delete_Reply();
+	SIM_sendCommand("AT+FTPPUTNAME=\"1249.txt\"");SIM_replyCommand(timeout_50);SIM_Delete_Reply();
 	SIM_sendCommand("AT+FTPPUTPATH=\"/public_html/\"");SIM_replyCommand(timeout_50);SIM_Delete_Reply();
 	//Ham 1,1,1360
 	SIM_sendCommandResponse("AT+FTPPUT=1", "+FTPPUT: 1,1,1360\r\n");
 	SIM_replyCommand(timeout_50);
 	SIM_Delete_Reply();
-	SIM_replyCommandResponse(timeout_50,"+FTPPUT: 1,1,1360\r\n");
+	SIM_replyCommandResponse(15000,"+FTPPUT: 1,1,1360\r\n");
 	SIM_Delete_BufReply();
 	SIM_Delete_ResponseEx();
 	//Ham 2,10
-	SIM_sendCommandResponse("AT+FTPPUT=2,10","+FTPPUT: 2,10\r\n");
-  SIM_replyCommandResponse(timeout_50,"+FTPPUT: 2,10\r\n");
+	SIM_sendCommandResponse("AT+FTPPUT=2,400","+FTPPUT: 2,400\r\n");
+  SIM_replyCommandResponse(timeout_50,"+FTPPUT: 2,400\r\n");
 	SIM_Delete_BufReply();
 	SIM_Delete_ResponseEx();
 
 	//Ham goi aaa
-	SIM_sendCommandResponse("aazzaaazz","+FTPPUT: 1,1,1360\r\n");
-	SIM_replyCommand(timeout_50);
-	SIM_Delete_Reply();
-	SIM_replyCommandResponse(10000, "+FTPPUT: 1,1,1360\r\n");
+	SIM_sendCommandResponse(data,"+FTPPUT: 1,1,1360\r\n");
+//	SIM_replyCommand(timeout_50);
+//	SIM_Delete_Reply();
+	SIM_replyCommandResponse(15000, "+FTPPUT: 1,1,1360\r\n");
 	SIM_Delete_ResponseEx();
 	SIM_Delete_BufReply();
 	HAL_Delay(1000);
 	SIM_Delete_Reply();
 	SIM_sendCommand("AT+FTPPUT=2,0");SIM_replyCommand(timeout_50);SIM_Delete_Reply();
-	SIM_replyCommandResponse(timeout_50,"+FTPPUT: 1,0\r\n");SIM_Delete_BufReply();
+	SIM_replyCommandResponse(15000,"+FTPPUT: 1,0\r\n");SIM_Delete_BufReply();SIM_Delete_ResponseEx();
 	dataSMS.readSMS = 1;
 }
 /**
@@ -721,9 +722,9 @@ void SIM_SendFTP(void){
   */
 void SIM_FinishFTP(void){
 		dataSMS.readSMS = 0;
-		SIM_sendCommand("AT+FTPQUIT");
-		SIM_replyCommand(timeout_5);
-		SIM_Delete_Reply();
+//		SIM_sendCommand("AT+FTPQUIT");
+//		SIM_replyCommand(timeout_5);
+//		SIM_Delete_Reply();
 		SIM_replyCommandResponse(timeout_50,"+FTPPUT: 1,61");
 		SIM_Delete_BufReply();
 		SIM_sendCommand("AT+CIPSHUT");

@@ -16,7 +16,7 @@
 "air_source_version2\diskio.o"
 "air_source_version2\syscall.o"
 "air_source_version2\ff_gen_drv.o"
-"air_source_version2\ccsbcs_1.o"
+"air_source_version2\ccsbcs.o"
 "air_source_version2\stm32f1xx_hal.o"
 "air_source_version2\stm32f1xx_hal_pwr.o"
 "air_source_version2\stm32f1xx_hal_gpio_ex.o"

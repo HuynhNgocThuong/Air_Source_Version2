@@ -35,6 +35,9 @@ typedef __packed struct {
 		
 		uint8_t gprs_min;
 		uint8_t gprs_hour;
+	
+		uint8_t ftp_hour;
+	
 		uint8_t I2C_Buffer[8];
 		char nameofday[7][12];
 }DS3231_t;

@@ -34,13 +34,13 @@ typedef enum{
  */
 struct PMS7003_Data{
 	volatile uint8_t 			frame;
-	volatile uint8_t 			checksum;
-	volatile uint8_t 			pm1p0;
-	volatile uint8_t 			pm2p5;
-	volatile uint8_t 			pm10;
-	volatile uint8_t 			pm1p0_ATM;
-	volatile uint8_t			pm2p5_ATM;
-	volatile uint8_t 			pm10_ATM;
+	volatile uint16_t 			checksum;
+	volatile uint16_t 			pm1p0;
+	volatile uint16_t 			pm2p5;
+	volatile uint16_t 			pm10;
+	volatile uint16_t 			pm1p0_ATM;
+	volatile uint16_t				pm2p5_ATM;
+	volatile uint16_t 			pm10_ATM;
 	uint8_t 			Buf;
 	uint8_t 			uartBuf[31];
 	uint8_t				countDataToReceive;

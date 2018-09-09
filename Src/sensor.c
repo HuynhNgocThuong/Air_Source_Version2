@@ -2,6 +2,7 @@
 extern ADC_HandleTypeDef hadc1;
 extern UART_HandleTypeDef huart1;
 extern Sensor_t sensor;
+//#define DEBUG 1
 /**
   * @brief  Lay du lieu tu cam bien
   * @param 	
@@ -9,7 +10,7 @@ extern Sensor_t sensor;
   */
 void Sensor_Convertdata(Sensor_t* handle){
 		handle->vAcquy = ((float) handle->ADC_Process[0])*3.32/4095;
-		handle->vCO = (((float) handle->ADC_Process[1])*(3.32/4095));
+		handle->vCO = ((float) handle->ADC_Process[1])*3.32/4095;
 		handle->vNO2 = ((float) handle->ADC_Process[2])*3.32/4095;
 		handle->vSO2 = ((float) handle->ADC_Process[3])*3.32/4095;
 	#ifdef DEBUG
@@ -21,8 +22,10 @@ void Sensor_Convertdata(Sensor_t* handle){
 		handle->ppmCO = 3154.5*(handle->vCO - 1.66);
 		handle->ppmNO2 = -71.24*(handle->vNO2 - 1.66);
 		handle->ppmSO2 = 294.81*(handle->vSO2 - 1.66);
-		handle->pAcquy = (handle->vAcquy/3.3)*100;
-
+		handle->pAcquy = (handle->vAcquy*5.7)*35.7-385.7;
+	#ifdef DEBUG
+		printf("pAcquy: %d\r\n",sensor.pAcquy);
+	#endif
 	 handle->fAdc = false;
 }
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)

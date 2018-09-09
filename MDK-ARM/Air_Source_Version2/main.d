@@ -38,8 +38,8 @@ air_source_version2\main.o: ../Inc/user_diskio.h
 air_source_version2\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 air_source_version2\main.o: ../Inc/sd.h
 air_source_version2\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
-air_source_version2\main.o: ../Inc/rtc.h
 air_source_version2\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+air_source_version2\main.o: ../Inc/rtc.h
 air_source_version2\main.o: ../Inc/pms7003.h
 air_source_version2\main.o: ../Inc/gpsneo.h
 air_source_version2\main.o: ../Inc/sensor.h

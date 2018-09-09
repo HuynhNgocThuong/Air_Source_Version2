@@ -259,10 +259,11 @@ FRESULT ReadLongFile(void)
     {
 			//SD.rdata mang 1000 phan tu
 			#ifdef DEBUG
-      HAL_UART_Transmit(&huart3, SD.rdata+i, 1, 0x1000);
+			HAL_UART_Transmit(&huart3, SD.rdata+i, 1, 0x1000);
 			#endif
     }
-    ind+=i1;
+		ind+=i1;
+
   }
   while(f_size>0);
 	#ifdef DEBUG
@@ -394,28 +395,29 @@ unsigned long SD_Amount_Space(void){
 	return fre_sect;
 }
 
-void SD_Push_Data(uint8_t date, uint8_t month, uint8_t year, uint8_t hour, uint8_t minute, uint8_t second, char* latitude, char* s_n, char* longtitude, char* e_w, 
-		uint8_t pm10, uint8_t pm1p0, uint8_t pm2p5, float ppmco, float ppmno2, float ppmso2, float acquy){
-	  sprintf(SD.date, "%d", date);
-		sprintf(SD.month, "%d", month);
-		sprintf(SD.year, "%d", year);
-		sprintf(SD.hour, "%d", hour);
-		sprintf(SD.minute, "%d", minute);
-		sprintf(SD.second, "%d", second);
-		sprintf(SD.pm10, "%d", pm10);
-		sprintf(SD.pm1p0, "%d", pm1p0);
-		sprintf(SD.pm2p5, "%d", pm2p5);
-		sprintf(SD.ppmCO, "%.2f", ppmco);
-		sprintf(SD.ppmNO2, "%.2f", ppmno2);
-		sprintf(SD.ppmSO2, "%.2f", ppmso2);
-		sprintf(SD.vAcquy, "%.2f", acquy);
-
+  void SD_Push_Data(uint8_t date, uint8_t month, uint8_t year, uint8_t hour, uint8_t minute, uint8_t second, char* latitude, char* s_n, char* longtitude, char* e_w, 
+		uint16_t pm10, uint16_t pm1p0, uint16_t pm2p5, float ppmco, float ppmno2, float ppmso2, float acquy){
 			
-		strcat(SD.wdata,SD.date);strcat(SD.wdata,"-");
-		strcat(SD.wdata,SD.month);strcat(SD.wdata,"-");
-		strcat(SD.wdata,SD.year);strcat(SD.wdata," ");
-		strcat(SD.wdata,SD.hour);strcat(SD.wdata,":");
-		strcat(SD.wdata,SD.minute);strcat(SD.wdata,":");
+		SD_Frame2(SD.date, date);
+	  SD_Frame2(SD.month, month);
+		SD_Frame2(SD.year, year);
+		SD_Frame2(SD.hour, hour);
+		SD_Frame2(SD.minute, minute);
+		SD_Frame2(SD.second, second);
+			
+		SD_Frame3(SD.pm10, pm10);
+		SD_Frame3(SD.pm1p0, pm1p0);	
+		SD_Frame3(SD.pm2p5, pm2p5);	
+		SD_Frame33(SD.ppmCO, ppmco);	
+		SD_Frame33(SD.ppmNO2, ppmno2);	
+		SD_Frame33(SD.ppmSO2, ppmso2);			
+		SD_Frame33(SD.pAcquy, acquy);				
+
+		strcat(SD.wdata,SD.date);
+		strcat(SD.wdata,SD.month);
+		strcat(SD.wdata,SD.year);
+		strcat(SD.wdata,SD.hour);
+		strcat(SD.wdata,SD.minute);
 		strcat(SD.wdata,SD.second);strcat(SD.wdata," ");
 
 		
@@ -432,6 +434,80 @@ void SD_Push_Data(uint8_t date, uint8_t month, uint8_t year, uint8_t hour, uint8
 		strcat(SD.wdata,SD.ppmCO);strcat(SD.wdata," ");
 		strcat(SD.wdata,SD.ppmNO2);strcat(SD.wdata," ");
 		strcat(SD.wdata,SD.ppmSO2);strcat(SD.wdata," ");
-		strcat(SD.wdata,SD.vAcquy);strcat(SD.wdata," ");
+		strcat(SD.wdata,SD.pAcquy);strcat(SD.wdata," ");
 		strcat(SD.wdata,"\r\n");
+		memset(SD.date,'\0',5);
+		memset(SD.month,'\0',5);
+		memset(SD.year,'\0',5);
+		memset(SD.hour,'\0',5);
+		memset(SD.minute,'\0',5);
+		memset(SD.second,'\0',5);
+		memset(SD.pm10,'\0',15);
+		memset(SD.pm1p0,'\0',15);
+		memset(SD.pm2p5,'\0',15);
+		memset(SD.ppmCO,'\0',15);
+		memset(SD.ppmNO2,'\0',15);
+		memset(SD.ppmSO2,'\0',15);
+		memset(SD.pAcquy,'\0',15);
+}
+		
+void SD_Filename(uint8_t date, uint8_t month, uint8_t year, uint8_t hour){
+	sprintf(SD.date, "%d", date);
+  sprintf(SD.month, "%d", month);
+	sprintf(SD.year, "%d", year);
+	sprintf(SD.hour, "%d", hour);
+	strcat(SD.filename,SD.date);
+	strcat(SD.filename,SD.month);
+	strcat(SD.filename,SD.year);
+	strcat(SD.filename,SD.hour);
+	strcat(SD.filename,".txt");
+	for(int i = 0; i < 5; i ++){
+		SD.date[i] = 0;
+		SD.month[i] = 0;
+		SD.year[i] = 0;
+		SD.hour[i] = 0;
+	}
+}
+void SD_Frame2(char* buffer, uint16_t count){
+	char temp[5];
+	if(count<=9){
+		strcat(buffer,"0");
+		sprintf(temp, "%d", count);
+		strcat(buffer, temp);
+	}
+	else{
+	sprintf(buffer, "%d", count);
+	}
+}
+void SD_Frame3(char* buffer, uint16_t count){
+	char temp[5];
+	if(count<=9){
+		strcat(buffer,"00");
+		sprintf(temp, "%d", count);
+		strcat(buffer, temp);
+	}
+	else if(10<=count<100){
+		strcat(buffer,"0");
+		sprintf(temp, "%d", count);
+		strcat(buffer, temp);
+	}
+	else{
+	sprintf(buffer, "%d", count);
+	}
+}
+void SD_Frame33(char* buffer, float count){
+	char temp[5];
+	if(count<=9){
+		strcat(buffer,"00");
+		sprintf(temp, "%0.f", count);
+		strcat(buffer, temp);
+	}
+	else if(10<=count<100){
+		strcat(buffer,"0");
+		sprintf(temp, "%0.f", count);
+		strcat(buffer, temp);
+	}
+	else{
+	sprintf(buffer, "%0.f", count);
+	}
 }

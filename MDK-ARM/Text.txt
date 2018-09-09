@@ -398,3 +398,43 @@ NEO6M
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+  
+  
+  FRESULT ReadLongFile(void)
+{
+  uint16_t i=0, i1=0;
+  uint32_t ind=0;
+  uint32_t f_size = MyFile.fsize;
+  sprintf(str1,"fsize: %lu\r\n",(unsigned long)f_size);
+	#ifdef DEBUG
+  HAL_UART_Transmit(&huart3,(uint8_t*)str1,strlen(str1),0x1000);
+	#endif
+  ind=0;
+  do
+  {
+    if(f_size<512)
+    {
+      i1=f_size;
+    }
+    else
+    {
+      i1=512;
+    }
+    f_size-=i1;
+    f_lseek(&MyFile,ind);
+    f_read(&MyFile,SD.rdata,i1,(UINT *)&bytesread);
+    for(i=0;i<bytesread;i++)
+    {
+			//SD.rdata mang 1000 phan tu
+			#ifdef DEBUG
+      HAL_UART_Transmit(&huart3, SD.rdata+i, 1, 0x1000);
+			#endif
+    }
+    ind+=i1;
+  }
+  while(f_size>0);
+	#ifdef DEBUG
+  HAL_UART_Transmit(&huart3,(uint8_t*)"\r\n",2,0x1000);
+	#endif
+  return FR_OK;
+}
